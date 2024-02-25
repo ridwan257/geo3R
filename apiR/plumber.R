@@ -1,4 +1,4 @@
-library(plumber)
+
 library(png)
 library(base64enc)
 library(jsonlite)
