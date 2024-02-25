@@ -22,7 +22,7 @@ outlierFilter <- function(v){
 
 
 ## ----------------- retrieve gene list -------------------
-query_genes = read.table('~/Desktop/micro-array/query_set/all_genes.txt', sep='\t', header=T)
+query_genes = read.table('./all_genes.txt', sep='\t', header=T)
 
 query_genes = list(
   metabolism = query_genes$xenobiotics_metabolism[query_genes$xenobiotics_metabolism != ""],
@@ -31,7 +31,7 @@ query_genes = list(
 )
 query_genes$all <- unlist(query_genes) |> unique()
 
-entrez_mapper <- read.table('../db/entrez_gene_annonation.tsv', sep='\t',
+entrez_mapper <- read.table('./db/entrez_gene_annonation.tsv', sep='\t',
                             col.names = c('ENTREZ_GENE_ID', 'Gene'), quote = "")
 
 
