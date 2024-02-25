@@ -14,7 +14,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Expose the port your API will run on
-EXPOSE 8000
+EXPOSE 10000
 
 # Command to run the API
 CMD ["Rscript", "run.R"]
