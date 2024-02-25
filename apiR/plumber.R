@@ -34,7 +34,7 @@ function (id){
   
   print(id)
   
-  gse <- readRDS(paste0('../db/', id, '.rds'))
+  gse <- readRDS(paste0('./db/', id, '.rds'))
   
   pdata <- pData(gse)
   
