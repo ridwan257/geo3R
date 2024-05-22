@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>GEO3R</title>
+
+	<link rel="stylesheet" type="text/css" href="./style/style.css">
+
+	<script type="text/javascript" src="https://string-db.org/javascript/combined_embedded_network_v2.0.4.js"></script>
+
+</head>
+
+<body>
+	<h1 class='header'>Analysis Micro-Array Data</h1>
+
+
+	<!------------------------- Spinner ------------------------>
+	<div class="loading-screen" id="loadingScreen">
+	    <div class="spinner"></div>
+	    <p style="text-align: center;">Loading...</p>
+	</div>
+
+	<!------------------- Contents Groes From Here -------------------->
+	<div id='options'>
+		<h3>Load Query Genes</h3>
+		<input type="file" id="queryGene">
+		<br>
+		<input type="submit" id="geneSubmit">
+	</div>
+	<br>
+
+	<div id='metadata-container'>
+		<!------------------------- Select Data to Analyse --------------------->
+		<select id="data-loader" onchange="analysis_selector(this.value)" required>
+			<option value="geo" selected> GEO Data </option>
+			<option value="custom"> Custom Data </option>
+		</select>
+
+		<!-------------------------- Title  ---------------------->
+		<h3 class="min-margin" >Load GSE Data</h3>
+
+		<!--------------------- load custom expression data --------------------->
+		<div id='custom-expression-set' class="min-margin">
+			<p> Expression Data File : <input type="file" id="exprs-data"> </p>
+			<p> Metadata File : <input type="file" id="meta-data"> </p>
+			<button onclick="load_custom_data()">Load File</button>
+		</div>
+
+		<!------ load GEO data container ------>
+		<div id='geo-handler' class="min-margin">
+			<p></p>
+			<p style="font-size: 14px;" id='data-processing'></p>
+			<input type="input" id='geo-id'>
+			<input type="button" id='load-geo' value="Load GEO" onclick="load_geo_data()">
+		</div>
+		
+		<div>
+			<input type="button" id="control" value="Select Control" onclick="select_pid(true)">
+			<input type="button" id="case" value="Select Case" onclick="select_pid(false)">
+			<input type="button" id="unselect" value="Unselect All" onclick="unselect(false)">
+			<input type="button" id="unselect" value="Remove Group" onclick="unselect(true)">
+			<input type="button" id="clear-all" value="Clear All" onclick="clear_all()">
+			<input type="button" id="run-deg" value='Run' onclick="run_geo()">
+		</div>
+		
+
+
+		<div class="table-container">
+			<table id="pdata-viewer">
+				<thead></thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		
+	</div>
+
+	<div id='view-container'>
+		<a href="view_deg.html" target="blank">Click Here to see the DEGs list...</a>
+
+	</div>
+
+
+	<!------------------------------- All plot goes Here -------------------------------->
+	<div id='plot-container'>
+		<h3>Plot Result</h3>
+
+		<div id='hclust-plot'>
+			<h5>Heirarchical Clustering</h5>
+			<img src="" id='hclust-main'>
+		</div>
+
+		<div id='pca-plot'>
+			<h5>PCA</h5>
+			<img src="" id='pca-var'>
+			<img src="" id='pca-main'>
+		</div>
+
+		<div id='heatmap-plot'>
+			<h5>HeatMap</h5>
+			<img src="" id='heatmap-main'>
+		</div>
+
+
+		<!-------------------------- Volcano plot container -------------------------->
+		<div id='volcano-plot'>
+			<h5>Volcano Plot</h5>
+			<input type="file" id='mark-gene-file'>
+			<input type="button" id="clear-file" value="Clear File" onclick="clear_file_volcano()">
+			<b>OR,</b>
+			<br>
+			<input type="text" id='gene-names'>
+			<br>
+
+			<div class="min-margin">
+				<input type="button" value='Mark Input' onclick="mark_input_genes()">
+				<input type="button" name="" value="Mark |FC| > 1">
+				<input type="button" id='hide-lebel' value="Hide Labels">
+				<input type="button" id='defult-plot' value="Reset Plot">
+			</div>
+
+			<div class="min-margin">
+				logFC cut-off : 
+				<input type="text" class="cut-off logFC" value="-1"> to
+				<input type="text" class="cut-off logFC" value="1">
+				<span> & </span>
+				Alpha Value : 
+				<input type="text" id='alpha-value' class='cut-off' value="0.1">
+				<select id="p-value" required>
+			        <option value="P.Value" selected>P value</option>
+			        <option value="adj.P.Val">FDR</option>
+			    </select>
+			</div>
+
+			<div class="min-margin">
+			    <button onclick="reload_volcano_plot()">Reload</button>
+			    <button onclick="show_pop_up_box()">Get DEG</button>
+			    <button onclick="load_ppi()">Load PPI</button>
+			</div>
+
+			<img src="" id='volcano-main'>
+
+			<div id="stringEmbedded"></div>
+			<!-- <img src="" id='pp-interaction'> -->
+
+			<!-------------------------- The pop-up box ----------------------------->
+			<div id="gene-list" class="pop-up">			
+				<span class="pop-button close" onclick="hide_pop_up_box()">&times;</span>
+				<span class="pop-button copy"> © </span>
+				<span> ← Click Here for copy! </span>
+			    <div></div>		    
+			</div>
+
+		</div>
+
+
+	</div>
+
+	<footer></footer>
+
+
+	<script type="text/javascript" src="./script/functions.js"></script>
+	<script type="text/javascript" src="./script/script.js"></script>
+	<script type="text/javascript">
+		// load_geo_data()
+		// .then(()=>{
+		// 	run_geo();
+		// });
+	</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
