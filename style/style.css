@@ -1,0 +1,96 @@
+html, body { height: 100%; }
+
+
+.tab-content-box { display: none; }
+
+.r-mtop-4px {margin-top: 4px;}
+.r-mbottom-4px {margin-bottom: 8px;}
+.r-mleft-4px {margin-left: 4px;}
+.r-mright-4px {margin-right: 4px;}
+
+.r-padding-sm { padding: 4px 12px !important; }
+.r-vcenter { display: flex; align-items: center; flex-wrap: wrap; }
+
+th:hover {
+    background-color: #ccc !important;
+}
+/* ==================================================== */
+/* -------------- Table Styles -------------- */
+/* ==================================================== */
+.nowrap-table td,
+.nowrap-table th {
+  white-space: nowrap;
+}
+.empty-table {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.empty-text {
+  font-size: 18px;
+  color: #888;
+}
+
+.table-container {
+  max-height: 450px;
+  overflow-y: auto;
+  position: relative;
+  margin-top: 10px;
+  border: 1px solid black;
+}
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+.table-container th, .table-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.table-container th {
+    background-color: #f2f2f2;
+    font-size: 16px;
+}
+
+.control {
+    background-color: rgba(42, 235, 21, 0.25);
+  }
+
+.case {
+    background-color: rgba(255, 99, 71, 0.25);
+}
+
+.selected {
+    background-color: lightblue;
+  }
+
+.table-container .asc{
+  background-color: tomato;
+}
+.table-container .des{
+  background-color: lightgreen;
+}
+
+/* ==================================================== */
+/* -------------- dropdown box style -------------- */
+/* ==================================================== */
+.r-dropdown-box{
+    display:none; 
+    min-width: 300px; 
+    max-height: 600px; 
+    overflow-y: auto; 
+    z-index: 2;
+}

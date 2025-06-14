@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microarray Analysis Dashboard</title>
+  <link rel="stylesheet" href="style/w3.css">
+	<link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="w3-sidebar w3-bar-block w3-light-grey w3-card" style="width:200px;height:100vh;">
+  <h4 class="w3-bar-item"><b>Analysis Tabs</b></h4>
+  <button class="w3-bar-item w3-button" onclick="openTab('home')">Overview</button>
+  <button class="w3-bar-item w3-button" onclick="openTab('deg')">Analysis</button>
+	<button class="w3-bar-item w3-button" onclick="openTab('deg-table')">DEG Table</button>
+  <button class="w3-bar-item w3-button" onclick="openTab('network')">Network</button>
+</div>
+
+<!-- Main Content -->
+<div style="margin-left:200px" class="w3-container">
+
+  <!-- ======================================================= -->
+  <!-- HOME Section for load data -->
+  <!-- ======================================================= -->
+	<div id="home" class="tab-content-box w3-animate-opacity">
+		<h1>Load Data</h1>
+
+		<div id="geo-handler" class="w3-section">
+			<label for="geo-id" class="w3-text-blue" style="font-weight: bold; margin-bottom: 6px;">Enter GEO ID:</label>
+			<input type="text" id="geo-id" class="w3-input w3-border w3-round" placeholder="e.g., GSE12345"/>
+			<button id="load-geo-btn" class="w3-button w3-blue w3-round-large r-mtop-4px">Load GEO</button>
+		</div>
+
+		<div id="geo-basic-info" class="w3-section w3-margin-top" style="display: block;">
+			<h5 class="w3-text-blue" style="margin-bottom: 12px;">Dataset Information</h5>
+			
+			<div class="w3-small">
+				<p><b>GEO ID:</b> <span id="info-geo-id"></span></p>
+				<p><b>Title:</b> <span id="info-title"></span></p>
+				<p><b>Annotation:</b> <span id="info-annotation"></span></p>
+				<p><b>Total Samples:</b> <span id="info-samples"></span></p>
+				<p><b>Data Processing:</b> <span id="info-data-processing"></span></p>
+			</div>
+		</div>
+
+		<!------ load GEO data container ------>
+		<div class="w3-panel w3-white">
+			<h1 class="w3-opacity"><b>Sample Informations</b></h1>
+		</div>
+		<div class="w3-section">
+			<div class="w3-bar w3-white">
+				<button class="w3-bar-item w3-button w3-ripple w3-border" onclick="select_pid(true)">Select Control</button>
+				<button class="w3-bar-item w3-button w3-ripple w3-border" onclick="select_pid(false)">Select Case</button>
+				<button class="w3-bar-item w3-button w3-ripple w3-border" onclick="unselect(false)">Unselect All</button>
+				<button class="w3-bar-item w3-button w3-ripple w3-border" onclick="unselect(true)">Remove Group</button>
+				<button class="w3-bar-item w3-button w3-ripple w3-border" onclick="clear_all()">Clear All</button>
+			</div>
+
+			<!-- drop-down for column select -->
+			<div class="w3-dropdown-click" id="pdata-dropdown-container"></div>
+			
+			<!-- Table For Metadata showing -->
+			<div class="table-container nowrap-table">
+				<table id="pdata-viewer">
+					<thead></thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- show feature data -->
+		 <div class="w3-section">
+				<div class="w3-panel w3-white">
+					<h1 class="w3-opacity"><b>Feature Data</b></h1>
+				</div>
+				<!-- drop-down for feature column select -->
+				<div class="w3-dropdown-click" id="fdata-dropdown-container"></div>
+				<div class="table-container nowrap-table">
+						<table id="fdata-viewer">
+							<thead></thead>
+							<tbody></tbody>
+						</table>
+				</div>
+		 </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- Analysis section -->
+  <!-- ======================================================= -->
+  <div id="deg" class="tab-content-box w3-animate-opacity">
+
+		<div class="w3-panel w3-white">
+				<h1 class="w3-opacity"><b>Run Analysis</b></h1>
+		</div>
+		<!-- options -->
+		<div class="w3-card w3-padding w3-margin w3-light-grey">
+			<!-- Log Transformatin and  Quantile Normalize -->
+			<div class="w3-margin-bottom">
+				<input class="w3-check" type="checkbox" id="quantile-normalize">
+				<label class="w3-text-dark-grey"><b>Quantile Normalize</b></label>
+				
+				<input class="w3-check" type="checkbox" id="log-trnsform">
+				<label class="w3-text-dark-grey"><b>Log2 Tranformation</b></label>
+			</div>
+
+			<!-- Use Probe ID or Collapse to Gene -->
+			<div class="w3-margin-bottom">
+				<label class="w3-text-dark-grey"><b>Gene Aggregation</b></label>
+				<select class="w3-select" id="collapse_method_selector" onchange="toggleCollapseOptions()">
+					<option value="probe" selected>Use Probe ID</option>
+					<option value="gene">Collapse to Gene</option>
+				</select>
+			</div>
+
+			<!-- Gene collapsing method -->
+			<div class="w3-margin-bottom" id="gene_collapse_options" style="display: none;">
+				<label class="w3-text-dark-grey"><b>Gene Collapsing Method</b></label>
+				<select class="w3-select" id="collapse_method">
+					<option value="maxvar">Max Variance</option>
+					<option value="mean" selected>Mean</option>
+					<option value="maxmean">Max of Means</option>
+				</select>
+			</div>
+
+			<!-- Gene mapping column  -->
+			<div class="w3-margin-bottom" id="gene_mapping_column" style="display: none;">
+				<label class="w3-text-dark-grey"><b>Gene Mapping Column</b></label>
+				<select class="w3-select" id="mapping-col"></select>
+			</div>
+
+			<!-- select if convert into gene symbol  -->
+			 <div class="w3-margin-bottom" id="gene_symbol_transform" style="display: none;">
+				<input class="w3-check" type="checkbox" id="convert-from-entrez">
+				<label class="w3-text-dark-grey">Convert to Gene Symbol if Entrez ID is used for collapsing the probe id</label>
+			</div>
+
+			<!-- P-value correction -->
+			<div class="w3-margin-bottom">
+				<label class="w3-text-dark-grey"><b>P-value Correction Method</b></label>
+				<select class="w3-select" id="pvalue_correction">
+					<option value="none">None</option>
+					<option value="bonferroni">Bonferroni</option>
+					<option value="fdr" selected>Benjamini-Hochberg (FDR)</option>
+				</select>
+			</div>
+
+			<!-- Filter Genes by Median Presence -->
+			<div class="w3-margin-bottom">
+				<label class="w3-text-dark-grey">
+					<b>Filter Genes by Median Presence</b>
+				</label><br>
+				<input class="w3-check" type="checkbox" id="filter_genes" onchange="toggleFilterN()">
+				<label for="filter_genes">Enable Filtering</label>
+
+				<div id="filter_n_input" style="margin-top: 8px; display: none;">
+					<label for="filter_n" class="w3-text-grey">Minimum samples with median present:</label>
+					<input class="w3-input w3-border w3-round-small" type="number" id="filter_n" min="1" value="2">
+				</div>
+			</div>
+
+			<!-- Run Button -->
+			<div class="w3-center">
+				<button class="w3-button w3-blue w3-round-large w3-hover-shadow" id="run_analysis_btn">Run Analysis</button>
+			</div>
+		</div>
+
+		<!-- Expression Distribution Plot -->
+		<div class="w3-section">
+			<h1 class="w3-opacity"><b>Expression Distribution Plot</b></h1>
+
+			<div class="w3-container">
+				<div class="w3-half">
+							<div class="w3-button we-green w3-ripple">
+									<img src="#" alt="" id="boxplot-edata-img" style="width: 100%;">
+							</div>
+					</div>
+
+					<div class="w3-half">
+							<div class="w3-button we-green w3-ripple">
+									<img src="#" alt="" id="densityplot-edata-img" style="width: 100%;">
+							</div>
+					</div>
+			</div>
+		</div>
+
+		<!-- PCA plot -->
+		<div class="w3-section">
+			<h1 class="w3-opacity"><b>PCA Plot</b></h1>
+			<div class="w3-bar w3-margin-bottom" style="display: flex; align-items: center;">
+				<label class="w3-bar-item">Group By</label>
+				<select id="group-option-pca" class="w3-bar-item w3-select w3-border w3-light-grey w3-margin-right" style="width:auto;"></select>
+				<label class="w3-bar-item">Legend</label>
+				<select id="legend-option-pca" class="w3-bar-item w3-select w3-border w3-light-grey w3-margin-right" style="width:auto;">
+					<option value="NA">Hide</option>
+					<option value="topleft">Top Left</option>
+					<option value="topright" selected>Top Right</option>
+					<option value="bottomleft">Bottom Left</option>
+					<option value="bottomright">Bottom Right</option>
+				</select>
+				<button id="group-option-pca-btn" class="w3-bar-item w3-button w3-green w3-small" style="padding: 4px 12px;">Set</button>
+			</div>
+			
+			<div class="w3-center">
+				<!-- <img src="./tmp/r_5brz_1748864243286_pca1.png" alt="" id="pca-edata-img" style="max-width:100%"> -->
+				<img src="" alt="" id="pca-edata-img" style="max-width:100%">
+			</div>
+		</div>
+
+		<!-- HCLUST and dendigram -->
+		<div class="w3-section">
+			<h2 class="w3-opacity"><b>Hierarchical Clustering</b></h2>
+
+			<div class="w3-bar w3-margin-bottom" style="display: flex; align-items: center;">
+				<label class="w3-bar-item">Group By</label>
+				<select id="group-option-hclust" class="w3-bar-item w3-select w3-border w3-light-grey w3-margin-right" style="width:auto;"></select>
+				<label class="w3-bar-item">Legend</label>
+				<select id="legend-option-hclust" class="w3-bar-item w3-select w3-border w3-light-grey w3-margin-right" style="width:auto;">
+					<option value="NA">Hide</option>
+					<option value="topleft">Top Left</option>
+					<option value="topright" selected>Top Right</option>
+					<option value="bottomleft">Bottom Left</option>
+					<option value="bottomright">Bottom Right</option>
+				</select>
+				<button id="group-option-hclust-btn" class="w3-bar-item w3-button w3-green w3-small" style="padding: 4px 12px;">Set</button>
+			</div>
+
+			<div class="w3-center">
+				<img src="" alt="Hierarchical Clustering" id="hclust-edata-img" class="w3-image" style="max-width:100%;">
+				<!-- <img src="./tmp/r_5brz_1748864243286_hclust1.png" alt="Hierarchical Clustering" id="hclust-edata-img" class="w3-image" style="max-width:100%;"> -->
+			</div>
+		</div>
+
+		<!-- volcano plot -->
+		<div class="w3-section">
+			<h1 class="w3-opacity"><b>Volcano Plot</b></h1>
+
+			<!-- <div class="r-mbottom-4px" style="display: flex; align-items: center;">
+				<input class="w3-margin-right" type="file" id="mark-gene-file">
+				<button class="w3-button w3-red w3-ripple w3-small r-padding-sm" id="clear-file">Clear File</button>
+				<b class="w3-small r-padding-sm">OR</b><br>
+			</div> -->
+			
+			<textarea id="gene-names" cols="80" rows="3" placeholder="Enter gene names..."></textarea>
+
+			<div class="r-vcenter r-mbottom-4px">
+				<input class="w3-check" type="checkbox" id="mark-input" style="top:0;">
+				<label for="mark-input" class="w3-small w3-margin-right">Mark Genes</label>
+
+				<input class="w3-check" type="checkbox" id="mark-fc" style="top:0;">
+				<label for="mark-fc" class="w3-small w3-margin-right">Mark all significant</label>
+
+				<input class="w3-check" type="checkbox" id="highlight-check" style="top:0;" checked>
+				<label for="highlight-check" class="w3-small r-mright-4px">Highlight</label>
+				<input class="w3-input w3-border w3-light-grey w3-small r-padding-sm r-mright-4px" style="width: 60px;" type="text" id="highlight-value" value="8">
+				<label class="r-mright-4px">and</label>
+				<select class="w3-select w3-border w3-light-grey w3-small" id="highlight-by" style="width: 150px;">
+					<option value="Sig" selected>Significant Genes</option>
+					<option value="Pvalue">P values and logFC</option>
+					<option value="Bvalue">B values</option>
+				</select>
+
+			</div>
+
+			<div class="r-mbottom-4px" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+				<label>logFC cut-off:</label>
+				<input class="w3-input w3-border w3-light-grey w3-small r-padding-sm" id="min-fc" style="width: 70px;" type="text" value="-1">
+				<label>to</label>
+				<input class="w3-input w3-border w3-light-grey w3-small r-padding-sm" id="max-fc" style="width: 70px;" type="text" value="1">
+
+				<label>Alpha Value:</label>
+				<input class="w3-input w3-border w3-light-grey w3-small r-padding-sm" id="alpha-val" style="width: 80px;" type="text" id="alpha-value" value="0.05">
+
+				<select class="w3-select w3-border w3-light-grey w3-small" id="y-axis" style="width: 120px;">
+					<option value="P.Value" selected>P value</option>
+					<option value="adj.P.Val">FDR</option>
+				</select>
+			</div>
+
+			<div class="w3-bar w3-margin-bottom">
+				<button class="w3-button w3-indigo w3-small w3-margin-right r-padding-sm" id="reload-plt-btn">Reload</button>
+				<button class="w3-button w3-grey w3-small w3-margin-right r-padding-sm" id="reset-plt-btn">Reset Plot</button>
+				<button class="w3-button w3-purple w3-small w3-margin-right r-padding-sm" id="show-deg-btn">Get DEG</button>
+				<button class="w3-button w3-pink w3-small r-padding-sm">Load PPI</button>
+			</div>
+
+			<div class="w3-center">
+				<img src="" id="volcano-edata-img" alt="Volcano Plot" class="w3-image" style="width:100%; max-width:650px;">
+			</div>
+		</div>
+
+		<!-- strip chart of genes -->
+		<div class="w3-section">
+			<h1 class="w3-opacity"><b>Box Plot of Genes</b></h1>
+
+			<textarea id="gene-names-boxplot" cols="80" rows="3" placeholder="Enter gene names for plot..."></textarea>
+
+			<div class="r-vcenter">
+				<label class="r-mright-4px">Gene in Row</label>
+				<input id='n-col-boxplot' class="w3-border w3-margin-right" type="text" value="5" style="width: 60px;">
+				<button id="gene-boxplot-btn" class="w3-button w3-teal w3-ripple r-padding-sm">Plot</button>
+			</div>
+
+			<div class="w3-center">
+				<img src="" id="gene-boxplot-img" alt="Boxplot EDATA Plot" class="w3-image" style="width:100%; max-width:650px;">
+			</div>
+		
+		</div>
+
+
+		<!-- Modal -->
+		<div id="degModal" class="w3-modal" style="z-index: 9999;">
+			<div class="w3-modal-content w3-animate-top w3-card-4" style="max-width: 600px;">
+				
+				<header class="w3-container w3-teal"> 
+					<span onclick="close_deg_modal()" class="w3-button w3-display-topright">&times;</span>
+					<h5>DEG Gene List</h5>
+				</header>
+				
+				<div class="w3-container w3-padding">
+					<button class="w3-button w3-green w3-small r-mbottom-4px" onclick="copy_deg_genes()">Copy</button>
+					<textarea id="deg-gene-list" class="w3-input w3-light-grey w3-border" 
+										rows="15" style="resize: none; font-family: 'Calibri';" readonly></textarea>
+				</div>
+			</div>
+		</div>
+
+  </div>
+
+	<!-- ======================================================= -->
+  <!-- Differential Gene Expression result -->
+  <!-- ======================================================= -->
+  <div id="deg-table" class="tab-content-box w3-animate-opacity">
+		<h1 class="w3-opacity"><b>Differential Gene Expression Table</b></h1>
+
+		 <!-- Controls -->
+		<div class="w3-row w3-margin-bottom r-vcenter">
+			<div class="w3-col s4">
+				<label>Search:</label>
+				<input id="search-input" class="w3-input w3-border" placeholder="Type gene name...">
+			</div>
+			<div class="w3-col s4 w3-padding">
+				<label>Entries per page:</label>
+				<select id="entries-select" class="w3-select w3-border">
+					<option value="25">25</option>
+					<option value="50" selected>50</option>
+					<option value="100">100</option>
+					<option value="200">200</option>
+					<option value="500">500</option>
+				</select>
+			</div>
+
+			<div class="w3-col s4 w3-padding">
+				<button class="w3-button w3-green" onclick="download_page_table()">Download Table</button>
+			</div>
+			
+  	</div>
+
+		<!-- Pagination -->
+		<div class="w3-bar w3-margin-top">
+			<button class="w3-button w3-border" onclick="prev_page_table()">Prev</button>
+			<span class="w3-bar-item page-info">Page 1</span>
+			<button class="w3-button w3-border" onclick="next_page_table()">Next</button>
+			<input id="go-to-page-up" type="text" style="width: 60px;">
+			<button class="w3-button w3-border" onclick="goto_page_table('go-to-page-up')">Go To</button>
+		</div>
+
+		<!-- Table -->
+		<div class="w3-responsive">
+			<table id="deg-viewer" class="w3-table w3-bordered w3-hoverable">
+				<thead></thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+		<!-- Pagination -->
+		<div class="w3-bar w3-margin-top">
+			<button class="w3-button w3-border" onclick="prev_page_table()">Prev</button>
+			<span class="w3-bar-item page-info">Page 1</span>
+			<button class="w3-button w3-border" onclick="next_page_table()">Next</button>
+			<input id="go-to-page-down" type="text" style="width: 60px;">
+			<button class="w3-button w3-border" onclick="goto_page_table('go-to-page-down')">Go To</button>
+		</div>
+
+
+
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- Network Viewer -->
+  <!-- ======================================================= -->
+  <div id="network" class="tab-content-box w3-animate-opacity">
+		<h1 id="w3-opacity"><b>Protein Protein Interaction Network</b></h1>
+		<p></p>
+  </div>
+
+</div>
+
+<div id="exitConfirm" style="display:none; position:fixed; top:0; background:#fff; padding:20px; z-index:1000;">
+  <p>Are you sure you want to leave? All session data will be deleted.</p>
+  <button id="confirmExit">Yes, Leave</button>
+  <button onclick="document.getElementById('exitConfirm').style.display='none'">Cancel</button>
+</div>
+
+<footer style="height: 400px;"></footer>
+
+<script src="script/global_vars.js"></script>
+<script src="script/utility_functions.js"></script>
+<script src="script/ui_handling_functions.js"></script>
+<script src="script/api_interacting_functions.js"></script>
+<script src="script/script.js"></script>
+
+</body>
+</html>
