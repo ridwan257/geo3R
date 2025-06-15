@@ -3,7 +3,7 @@ if (!requireNamespace("renv", quietly = TRUE))
 
 if (!dir.exists("../tmp")) dir.create("../tmp")
 
-renv::activate()
+renv::restore()
 
 library(plumber)
 plumb('./plumber_api.R')$run(host='127.0.0.1', port=8080)

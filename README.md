@@ -32,20 +32,20 @@ To run the backend API and perform analyses, you need the following:
 If you don't have **Bioconductor** installed yet, run the following in your R console:
 
 ```r
-    > install.packages("BiocManager")
+> install.packages("BiocManager")
 ```
 
 ## 💡 How to Use
 
 First clone the repository,
 ```
-    git clone https://github.com/ridwan257/geo3R.git
-    cd geo3R
+git clone https://github.com/ridwan257/geo3R.git
+cd geo3R
 ```
 
 Then launch the R api. It may takes some time while running first time, beacuse it will install all missing dependency to run R api.
 ```
-    bash run.sh
+bash run.sh
 ```
 
 After successfuly launching api, just open the `index.html` file in any browser. You can create multiple independent tabs, each one maintains its own analysis state, making no data corruption.
