@@ -2,5 +2,6 @@
 */.DS_Store
 tmp/*
 api-r/.Rprofile
+api-r/.Rhistory
 api-r/db/
 !api-r/db/entrez_gene_annonation.tsv
